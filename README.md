@@ -160,11 +160,12 @@ pip install -e .
 # #4 translate — 双向口译
 python -m scripts.smoke_translate scripts/audio-samples/cs_zh_01.wav --out out_translate.wav
 
-# #5 whisper — 流式转写（开发中）
+# #5 whisper — 流式转写
 python -m scripts.smoke_whisper scripts/audio-samples/cs_zh_01.wav
 
-# #6 assistant — 推理 + 工具调用（开发中）
-python -m scripts.smoke_assistant --order A12345
+# #6 rt-2 — 推理 + 工具调用
+python -m scripts.smoke_rt2 scripts/audio-samples/cs_zh_01.wav \
+    --out rt2_out.wav --reasoning-effort medium --order-id A12345
 ```
 
 通过判据：脚本退出码 0，且打印的 `first_audio_ms < 1000`。
