@@ -4,6 +4,7 @@ See docs/04-tech-stack.md and .env.example for the canonical variable list.
 TODO (issue #01 scaffold): expand fields, add validators.
 """
 from functools import lru_cache
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 

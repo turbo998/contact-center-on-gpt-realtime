@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend:
+    name: Backend (ruff + mypy + pytest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements*.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Ruff (lint)
+        run: ruff check .
+
+      - name: Mypy (type-check)
+        # mypy strict on stubs is too noisy; allow this step to fail until issue #13 expands coverage
+        continue-on-error: true
+        run: mypy app
+
+      - name: Pytest
+        run: pytest -q
+
+  frontend:
+    name: Frontend (lint + build)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install (npm ci with fallback to npm install on first run)
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install --no-audit --no-fund
+          fi
+
+      - name: Lint
+        # ESLint config may be incomplete on first scaffold; don't block CI yet
+        continue-on-error: true
+        run: npm run lint --if-present
+
+      - name: Build
+        run: npm run build
+
+  infra:
+    name: Infra (bicep build + compose config)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Bicep CLI
+        run: |
+          curl -Lo bicep https://github.com/Azure/bicep/releases/latest/download/bicep-linux-x64
+          chmod +x bicep
+          sudo mv bicep /usr/local/bin/bicep
+          bicep --version
+
+      - name: bicep build
+        run: bicep build infra/main.bicep --outdir /tmp/bicep-out
+
+      - name: docker compose config
+        run: docker compose config -q
