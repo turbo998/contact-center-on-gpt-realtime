@@ -22,6 +22,9 @@ param managedIdentityClientId string
 @description('Container image, e.g. <acr>.azurecr.io/backend:<tag>.')
 param image string
 
+@description('azd service name tag (must match services.<name> in azure.yaml).')
+param serviceName string = 'backend'
+
 @description('Azure OpenAI / Foundry endpoint, e.g. https://<acct>.openai.azure.com')
 param azureOpenAiEndpoint string
 
@@ -51,10 +54,13 @@ param minReplicas int = 1
 @minValue(1)
 param maxReplicas int = 3
 
+@description('ACR login server (e.g. <name>.azurecr.io) for the registries block. Empty = no auth (public image).')
+param acrLoginServer string = ''
+
 resource app 'Microsoft.App/containerApps@2024-03-01' = {
   name: name
   location: location
-  tags: tags
+  tags: union(tags, { 'azd-service-name': serviceName })
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
@@ -65,6 +71,12 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
     managedEnvironmentId: containerEnvId
     configuration: {
       activeRevisionsMode: 'Single'
+      registries: empty(acrLoginServer) ? [] : [
+        {
+          server: acrLoginServer
+          identity: managedIdentityId
+        }
+      ]
       ingress: {
         external: true
         targetPort: 8000

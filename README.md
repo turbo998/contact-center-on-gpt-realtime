@@ -119,6 +119,46 @@ flowchart TB
 
 ---
 
+## 🚀 一键部署到 Azure（`azd up`）
+
+需要 [Azure Developer CLI](https://aka.ms/azd) 和一个已有的 Azure AI Foundry / Azure OpenAI 账户（含三个模型部署：`gpt-realtime-translate` / `gpt-realtime-whisper` / `gpt-realtime-2`）。
+
+```bash
+# 1. 登录
+azd auth login
+az login                                          # bicep 需要
+
+# 2. 初始化环境（首次）
+azd env new demo
+azd env set AZURE_LOCATION              eastus
+azd env set AZURE_FOUNDRY_ACCOUNT_NAME  <你的 Foundry 账户名>
+azd env set AZURE_OPENAI_ENDPOINT       https://<account>.openai.azure.com
+
+# 3. 一键 provision + build + push + deploy
+azd up
+
+# 4. 拿到 URL（也会写到 .azure/demo/.env）
+azd env get-values | grep -E 'FRONTEND_URL|BACKEND_URL'
+
+# 5. 增量更新
+azd deploy backend            # 只重建后端镜像
+azd deploy frontend           # 只重建前端镜像
+azd provision                 # 只跑 bicep
+
+# 6. 全部清理
+azd down --purge
+```
+
+`azd up` 内部会：
+1. 跑 `infra/main.bicep` 建：Log Analytics / Container Apps Env / UAMI（赋 *Cognitive Services OpenAI User*）/ ACR（UAMI 拿 AcrPull）/ 两个 Container App
+2. 用 `Dockerfile` 构建并推送 backend + frontend 镜像到 ACR
+3. 用 UAMI 拉镜像启动 ACA，无 API key、无 ACR admin user
+4. 注入运行时环境变量（`AZURE_CLIENT_ID` / `AZURE_OPENAI_ENDPOINT` / 三个 deployment 名 / `NEXT_PUBLIC_BACKEND_WS_URL`）
+
+> 完整流程、区域限制、配额、故障排查见 [`docs/06-deployment.md`](./docs/06-deployment.md)。
+
+---
+
 ## 💰 成本提示
 
 三模型计费方式不同（translate 按 token、whisper 与 realtime-2 按音频分钟）。一通典型 5 分钟跨境通话粗估 **~ $0.5 – $1.0**。
