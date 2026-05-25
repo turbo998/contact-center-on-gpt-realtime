@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: contact-center-backend:dev
+    environment:
+      - APP_ENV=development
+      - AZURE_OPENAI_ENDPOINT=${AZURE_OPENAI_ENDPOINT}
+      - AZURE_OPENAI_API_KEY=${AZURE_OPENAI_API_KEY}
+      - AZURE_OPENAI_API_VERSION=${AZURE_OPENAI_API_VERSION:-2025-04-01-preview}
+      - DEPLOYMENT_TRANSLATE=${DEPLOYMENT_TRANSLATE}
+      - DEPLOYMENT_WHISPER=${DEPLOYMENT_WHISPER}
+      - DEPLOYMENT_ASSISTANT=${DEPLOYMENT_ASSISTANT}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - AUDIT_DIR=/app/audit
+    volumes:
+      - ./backend:/app
+      - ./audit:/app/audit
+    ports:
+      - "8000:8000"
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    image: contact-center-frontend:dev
+    environment:
+      - NEXT_PUBLIC_BACKEND_WS_BASE=ws://localhost:8000
+      - NEXT_PUBLIC_BACKEND_HTTP_BASE=http://localhost:8000
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    command: npm run dev
