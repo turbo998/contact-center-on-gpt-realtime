@@ -1,0 +1,113 @@
+{
+  "orders": {
+    "A12345": {
+      "order_id": "A12345",
+      "sku": "COFFEE-MAKER",
+      "product_name": "Premium Drip Coffee Maker (1.5L)",
+      "from_country": "CN",
+      "to_country": "GB",
+      "status": "delivered_damaged",
+      "amount": 149.00,
+      "currency": "GBP",
+      "ordered_at": "2026-05-18T09:23:00Z",
+      "delivered_at": "2026-05-23T14:10:00Z",
+      "customer_id": "CUST-88812",
+      "insurance_policy_id": "INS-7788",
+      "notes": "Customer reported leakage on arrival."
+    },
+    "B67890": {
+      "order_id": "B67890",
+      "sku": "SMART-KETTLE",
+      "product_name": "Smart Kettle 1.7L",
+      "from_country": "CN",
+      "to_country": "DE",
+      "status": "in_transit",
+      "amount": 89.00,
+      "currency": "EUR",
+      "ordered_at": "2026-05-22T11:00:00Z",
+      "delivered_at": null,
+      "customer_id": "CUST-71203",
+      "insurance_policy_id": "INS-0001",
+      "notes": null
+    },
+    "D55555": {
+      "order_id": "D55555",
+      "sku": "LAPTOP",
+      "product_name": "Ultrabook 14\" 16GB/512GB",
+      "from_country": "US",
+      "to_country": "DE",
+      "status": "delivered",
+      "amount": 1299.00,
+      "currency": "EUR",
+      "ordered_at": "2026-05-10T08:00:00Z",
+      "delivered_at": "2026-05-15T13:30:00Z",
+      "customer_id": "CUST-90011",
+      "insurance_policy_id": "INS-2002",
+      "notes": null
+    }
+  },
+  "tariffs": {
+    "CN-GB-COFFEE-MAKER": {
+      "from_country": "CN",
+      "to_country": "GB",
+      "sku": "COFFEE-MAKER",
+      "rate_percent": 12.5,
+      "amount": 18.50,
+      "currency": "GBP",
+      "basis": "HS 8516.71, UK Global Tariff 2026"
+    },
+    "CN-DE-SMART-KETTLE": {
+      "from_country": "CN",
+      "to_country": "DE",
+      "sku": "SMART-KETTLE",
+      "rate_percent": 8.0,
+      "amount": 7.12,
+      "currency": "EUR",
+      "basis": "EU TARIC 8516.10"
+    },
+    "US-DE-LAPTOP": {
+      "from_country": "US",
+      "to_country": "DE",
+      "sku": "LAPTOP",
+      "rate_percent": 0.0,
+      "amount": 0.00,
+      "currency": "EUR",
+      "basis": "ITA 1996 / WTO duty-free"
+    }
+  },
+  "insurances": {
+    "INS-7788": {
+      "policy_id": "INS-7788",
+      "customer_id": "CUST-88812",
+      "covers_shipping": true,
+      "covers_tariff": true,
+      "covers_replacement": true,
+      "deductible": 0.00,
+      "currency": "GBP",
+      "valid_until": "2027-01-31",
+      "notes": "Premium care plan."
+    },
+    "INS-0001": {
+      "policy_id": "INS-0001",
+      "customer_id": "CUST-71203",
+      "covers_shipping": false,
+      "covers_tariff": false,
+      "covers_replacement": true,
+      "deductible": 30.00,
+      "currency": "EUR",
+      "valid_until": "2026-12-31",
+      "notes": "Basic plan, customer pays shipping & tariff."
+    },
+    "INS-2002": {
+      "policy_id": "INS-2002",
+      "customer_id": "CUST-90011",
+      "covers_shipping": true,
+      "covers_tariff": false,
+      "covers_replacement": false,
+      "deductible": 50.00,
+      "currency": "EUR",
+      "valid_until": "2026-08-31",
+      "notes": "Shipping-only coverage."
+    }
+  }
+}
