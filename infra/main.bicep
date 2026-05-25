@@ -1,6 +1,5 @@
 // Top-level deployment for contact-center-on-gpt-realtime.
 // See docs/06-deployment.md for the full plan.
-// TODO (issue #19 bicep-infra): wire actual modules.
 
 targetScope = 'resourceGroup'
 
@@ -10,8 +9,17 @@ param environmentName string
 @description('Primary region for all resources.')
 param location string = resourceGroup().location
 
-@description('Existing or to-be-created Azure OpenAI / Foundry account name.')
+@description('Name of the existing Azure AI Foundry / Azure OpenAI account.')
 param foundryAccountName string
+
+@description('Endpoint of the Foundry account, e.g. https://<acct>.openai.azure.com')
+param azureOpenAiEndpoint string
+
+@description('Backend container image (set by azd after build/push).')
+param backendImage string = 'mcr.microsoft.com/k8se/quickstart:latest'
+
+@description('Frontend container image (set by azd after build/push).')
+param frontendImage string = 'mcr.microsoft.com/k8se/quickstart:latest'
 
 @description('Tags applied to every resource.')
 param tags object = {
@@ -19,7 +27,7 @@ param tags object = {
   project: 'contact-center-on-gpt-realtime'
 }
 
-// -- Modules (placeholders) ----------------------------------------------------
+// -- Modules -------------------------------------------------------------------
 
 module logAnalytics 'modules/log-analytics.bicep' = {
   name: 'logAnalytics'
@@ -65,6 +73,9 @@ module backend 'modules/container-app-backend.bicep' = {
     tags: tags
     containerEnvId: containerEnv.outputs.id
     managedIdentityId: managedIdentity.outputs.id
+    managedIdentityClientId: managedIdentity.outputs.clientId
+    image: backendImage
+    azureOpenAiEndpoint: azureOpenAiEndpoint
   }
 }
 
@@ -76,10 +87,14 @@ module frontend 'modules/container-app-frontend.bicep' = {
     tags: tags
     containerEnvId: containerEnv.outputs.id
     backendUrl: backend.outputs.url
+    image: frontendImage
   }
 }
 
 // -- Outputs -------------------------------------------------------------------
 
+output AZURE_RESOURCE_GROUP string = resourceGroup().name
+output AZURE_LOCATION string = location
 output BACKEND_URL string = backend.outputs.url
 output FRONTEND_URL string = frontend.outputs.url
+output AZURE_MANAGED_IDENTITY_CLIENT_ID string = managedIdentity.outputs.clientId
