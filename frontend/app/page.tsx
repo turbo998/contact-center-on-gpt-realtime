@@ -1,14 +1,28 @@
+"use client";
 /**
  * Single-page three-pane workspace.
  * See docs/14-frontend-design.md §14.1.
- * TODO (issue #12 frontend-layout): implement ThreePane + role param.
  */
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import { Header } from "@/components/Header";
+import { ThreePane, type Role } from "@/components/ThreePane";
+
+function PageInner() {
+  const param = useSearchParams().get("role");
+  const role: Role = param === "customer" || param === "agent" ? param : "both";
+  return (
+    <div className="flex min-h-screen flex-col bg-slate-100 text-slate-900">
+      <Header />
+      <ThreePane role={role} />
+    </div>
+  );
+}
+
 export default function HomePage() {
   return (
-    <main className="grid min-h-screen grid-cols-1 lg:grid-cols-3 gap-2 p-4">
-      <section className="rounded-2xl bg-blue-50 p-4">Customer Pane (ZH) — TODO</section>
-      <section className="rounded-2xl bg-emerald-50 p-4">Agent Pane (EN) — TODO</section>
-      <section className="rounded-2xl bg-violet-50 p-4">AI Assist Pane — TODO</section>
-    </main>
+    <Suspense fallback={<div className="p-4 text-sm text-slate-500">Loading…</div>}>
+      <PageInner />
+    </Suspense>
   );
 }
