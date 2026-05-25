@@ -143,6 +143,7 @@ export function dispatch(
       return;
     }
 
+    case "rt2.tool_call":
     case "rt2.tool.call": {
       const p = env.payload as Rt2ToolCallPayload;
       s.addToolCall({
@@ -155,6 +156,7 @@ export function dispatch(
       return;
     }
 
+    case "rt2.tool_result":
     case "rt2.tool.result": {
       const p = env.payload as Rt2ToolResultPayload;
       s.updateToolCall(p.call_id, {
