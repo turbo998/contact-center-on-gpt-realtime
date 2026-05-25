@@ -10,6 +10,7 @@ from pathlib import Path
 from fastapi import FastAPI
 
 from app.audit import AuditLogger, JsonlFileSink, NullSink
+from app.realtime.assistant import AssistantConnection, AssistantPipe
 from app.realtime.fork_audio import AudioFork, FoundryConnection
 from app.realtime.sessions import TRANSLATE_SESSION, WHISPER_SESSION
 from app.session_store import SessionStore
@@ -43,6 +44,27 @@ def _default_fork_factory():  # pragma: no cover — requires Azure creds at run
     return factory
 
 
+def _default_assistant_factory():  # pragma: no cover — requires Azure creds
+    """Build an AssistantPipe wired to real Foundry rt-2 (#10).
+
+    Returns None when DEPLOYMENT_RT2 isn't set so dev / CI without Azure creds
+    still boot cleanly. /ws/assist will then operate in handshake-only mode.
+    """
+    rt2_dep = os.getenv("DEPLOYMENT_RT2")
+    if not rt2_dep:
+        return None
+
+    def factory(call_id, outbound, next_seq, reasoning_effort, order_id, context_summary):
+        conn = AssistantConnection(deployment=rt2_dep)
+        return AssistantPipe(
+            call_id=call_id, conn=conn, outbound=outbound, next_seq=next_seq,
+            reasoning_effort=reasoning_effort,
+            order_id=order_id, context_summary=context_summary,
+        )
+
+    return factory
+
+
 def _build_audit() -> AuditLogger:
     sink_kind = os.getenv("AUDIT_SINK", "local")
     if sink_kind == "local":
@@ -60,12 +82,15 @@ def create_app(
     audit: AuditLogger | None = None,
     store: SessionStore | None = None,
     fork_factory=None,
+    assistant_factory=None,
 ) -> FastAPI:
-    """App factory. Tests inject NullSink + a fresh SessionStore + fake fork."""
+    """App factory. Tests inject NullSink + a fresh SessionStore + fake fork/assistant."""
     audit = audit or _build_audit()
     store = store or SessionStore(audit=audit)
     if fork_factory is None:
         fork_factory = _default_fork_factory()
+    if assistant_factory is None:
+        assistant_factory = _default_assistant_factory()
 
     app = FastAPI(title="contact-center-on-gpt-realtime")
 
@@ -75,7 +100,7 @@ def create_app(
 
     app.include_router(ws_customer.make_router(store, audit, fork_factory=fork_factory))
     app.include_router(ws_agent.make_router(store, audit))
-    app.include_router(ws_assist.make_router(store, audit))
+    app.include_router(ws_assist.make_router(store, audit, assistant_factory=assistant_factory))
 
     # Expose for tests / introspection.
     app.state.audit = audit
