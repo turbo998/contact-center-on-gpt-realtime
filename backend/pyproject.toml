@@ -9,6 +9,26 @@ ignore = ["E501"]
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 testpaths = ["tests"]
+addopts = "--cov=app --cov-report=term-missing --cov-fail-under=70"
+
+[tool.coverage.run]
+source = ["app"]
+branch = false
+omit = [
+    "app/config.py",
+    "app/realtime/translate.py",
+    "app/realtime/whisper.py",
+    "app/tools/check_insurance.py",
+    "app/tools/check_tariff.py",
+    "app/tools/get_order.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+]
 
 [tool.mypy]
 python_version = "3.12"
