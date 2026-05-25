@@ -1,4 +1,5 @@
 import { StatusBadge } from "./StatusBadge";
+import { AudioControls } from "./AudioControls";
 
 export function AgentPane() {
   return (
@@ -15,7 +16,8 @@ export function AgentPane() {
           Transcript stream binds to <code>/ws/agent</code> in issue #16.
         </div>
       </div>
-      <div className="border-t border-agent-500/20 bg-white/60 p-3">
+      <div className="flex items-center justify-between gap-3 border-t border-agent-500/20 bg-white/60 p-3">
+        <AudioControls variant="agent" />
         <button
           type="button"
           className="rounded-xl bg-assist-500 px-3 py-1.5 text-sm font-medium text-white shadow-sm transition hover:bg-assist-700 disabled:opacity-40"
