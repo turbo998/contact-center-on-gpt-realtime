@@ -18,6 +18,9 @@ param backendUrl string
 @description('Container image, e.g. <acr>.azurecr.io/frontend:<tag>.')
 param image string
 
+@description('azd service name tag (must match services.<name> in azure.yaml).')
+param serviceName string = 'frontend'
+
 @description('CPU cores per replica.')
 param cpu string = '0.5'
 
@@ -35,14 +38,32 @@ param maxReplicas int = 3
 // Derive the wss:// URL from the https:// backend URL.
 var backendWsUrl = replace(backendUrl, 'https://', 'wss://')
 
+@description('Resource ID of the user-assigned managed identity (used as ACR pull identity).')
+param managedIdentityId string = ''
+
+@description('ACR login server. Empty = no auth.')
+param acrLoginServer string = ''
+
 resource app 'Microsoft.App/containerApps@2024-03-01' = {
   name: name
   location: location
-  tags: tags
+  tags: union(tags, { 'azd-service-name': serviceName })
+  identity: empty(managedIdentityId) ? { type: 'None' } : {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${managedIdentityId}': {}
+    }
+  }
   properties: {
     managedEnvironmentId: containerEnvId
     configuration: {
       activeRevisionsMode: 'Single'
+      registries: empty(acrLoginServer) || empty(managedIdentityId) ? [] : [
+        {
+          server: acrLoginServer
+          identity: managedIdentityId
+        }
+      ]
       ingress: {
         external: true
         targetPort: 3000

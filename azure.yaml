@@ -1,9 +1,17 @@
-# Azure Developer CLI configuration
-# See: https://aka.ms/azd
-
+# Azure Developer CLI configuration — `azd up` deploys this template.
+# See: https://aka.ms/azd  and  docs/06-deployment.md
 name: contact-center-on-gpt-realtime
 metadata:
-  template: contact-center-on-gpt-realtime@0.1.0
+  template: contact-center-on-gpt-realtime@0.2.0
+
+# Required env vars (azd will prompt if unset on first `azd up`):
+#   AZURE_ENV_NAME                — short env name (e.g. dev, demo); becomes resource suffix
+#   AZURE_LOCATION                — region for ACA + ACR + LA (e.g. eastus, canadacentral)
+#   AZURE_FOUNDRY_ACCOUNT_NAME    — existing Azure AI Foundry / OpenAI account name
+#   AZURE_OPENAI_ENDPOINT         — https://<account>.openai.azure.com
+#
+# After `azd up`, outputs land in .azure/<env>/.env:
+#   BACKEND_URL, FRONTEND_URL, AZURE_CONTAINER_REGISTRY_ENDPOINT, …
 
 services:
   backend:
@@ -11,14 +19,14 @@ services:
     language: python
     host: containerapp
     docker:
-      path: ./Dockerfile
+      path: Dockerfile
       context: .
   frontend:
     project: ./frontend
     language: ts
     host: containerapp
     docker:
-      path: ./Dockerfile
+      path: Dockerfile
       context: .
 
 infra:
@@ -27,10 +35,35 @@ infra:
   module: main
 
 hooks:
+  # Sanity-check required env vars before provisioning — fail fast with a clear message.
   preprovision:
     shell: sh
     run: |
-      echo "Pre-provision: ensuring Foundry deployments exist..."
-      echo "  - $DEPLOYMENT_TRANSLATE"
-      echo "  - $DEPLOYMENT_WHISPER"
-      echo "  - $DEPLOYMENT_ASSISTANT"
+      set -e
+      missing=""
+      for var in AZURE_ENV_NAME AZURE_LOCATION AZURE_FOUNDRY_ACCOUNT_NAME AZURE_OPENAI_ENDPOINT; do
+        if [ -z "$(eval echo \$$var)" ]; then
+          missing="$missing $var"
+        fi
+      done
+      if [ -n "$missing" ]; then
+        echo "❌ Missing required env vars:$missing"
+        echo "   Set them with: azd env set <NAME> <VALUE>"
+        exit 1
+      fi
+      echo "✅ Pre-provision check passed."
+      echo "   Foundry account: $AZURE_FOUNDRY_ACCOUNT_NAME"
+      echo "   Endpoint:        $AZURE_OPENAI_ENDPOINT"
+      echo "   Region:          $AZURE_LOCATION"
+
+  # After deploy, print the URLs the user actually needs.
+  postdeploy:
+    shell: sh
+    run: |
+      echo ""
+      echo "🎉 Deploy complete."
+      echo "   Frontend: $FRONTEND_URL"
+      echo "   Backend:  $BACKEND_URL"
+      echo ""
+      echo "Tail backend logs:"
+      echo "   az containerapp logs show -g $AZURE_RESOURCE_GROUP -n ca-backend-$AZURE_ENV_NAME --follow"

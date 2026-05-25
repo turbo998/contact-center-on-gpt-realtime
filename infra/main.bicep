@@ -65,6 +65,18 @@ module foundryRole 'modules/foundry-role.bicep' = {
   }
 }
 
+// Container registry — azd pushes images here; ACA pulls via UAMI (AcrPull).
+module registry 'modules/container-registry.bicep' = {
+  name: 'registry'
+  params: {
+    // ACR names must be alphanumeric only.
+    name: 'acr${uniqueString(resourceGroup().id, environmentName)}'
+    location: location
+    tags: tags
+    pullPrincipalId: managedIdentity.outputs.principalId
+  }
+}
+
 module backend 'modules/container-app-backend.bicep' = {
   name: 'backend'
   params: {
@@ -76,6 +88,7 @@ module backend 'modules/container-app-backend.bicep' = {
     managedIdentityClientId: managedIdentity.outputs.clientId
     image: backendImage
     azureOpenAiEndpoint: azureOpenAiEndpoint
+    acrLoginServer: registry.outputs.loginServer
   }
 }
 
@@ -88,6 +101,8 @@ module frontend 'modules/container-app-frontend.bicep' = {
     containerEnvId: containerEnv.outputs.id
     backendUrl: backend.outputs.url
     image: frontendImage
+    managedIdentityId: managedIdentity.outputs.id
+    acrLoginServer: registry.outputs.loginServer
   }
 }
 
@@ -95,6 +110,8 @@ module frontend 'modules/container-app-frontend.bicep' = {
 
 output AZURE_RESOURCE_GROUP string = resourceGroup().name
 output AZURE_LOCATION string = location
+output AZURE_CONTAINER_REGISTRY_ENDPOINT string = registry.outputs.loginServer
+output AZURE_CONTAINER_REGISTRY_NAME string = registry.outputs.name
 output BACKEND_URL string = backend.outputs.url
 output FRONTEND_URL string = frontend.outputs.url
 output AZURE_MANAGED_IDENTITY_CLIENT_ID string = managedIdentity.outputs.clientId
