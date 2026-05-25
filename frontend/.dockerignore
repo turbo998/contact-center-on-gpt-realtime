@@ -1,0 +1,22 @@
+# Frontend .dockerignore — keep build context small.
+node_modules
+.next
+out
+__tests__
+*.test.*
+*.spec.*
+coverage/
+.nyc_output/
+.eslintcache
+tsconfig.tsbuildinfo
+.env
+.env.*
+!.env.example
+.git/
+.gitignore
+.github/
+README.md
+*.md
+Dockerfile
+.dockerignore
+vitest.config.ts

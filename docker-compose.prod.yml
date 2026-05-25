@@ -1,0 +1,53 @@
+# Production-like overlay. Use with:
+#   docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Differences vs. dev compose:
+#   - No bind mounts (image is immutable).
+#   - No --reload / npm run dev (runs the production entrypoints baked into the images).
+#   - Healthchecks on both services.
+#   - restart: unless-stopped.
+#   - Audit log mounted as a *named* volume for persistence.
+
+services:
+  backend:
+    image: contact-center-backend:prod
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - APP_ENV=production
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - AUDIT_DIR=/app/audit
+    # Override dev command — use the CMD baked into the image.
+    command: []
+    volumes:
+      - audit-data:/app/audit
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/health', timeout=2).status==200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+  frontend:
+    image: contact-center-frontend:prod
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_BACKEND_WS_BASE=${NEXT_PUBLIC_BACKEND_WS_BASE:-ws://backend:8000}
+      - NEXT_PUBLIC_BACKEND_HTTP_BASE=${NEXT_PUBLIC_BACKEND_HTTP_BASE:-http://backend:8000}
+    command: []
+    volumes: []
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--spider", "--tries=1", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  audit-data:
