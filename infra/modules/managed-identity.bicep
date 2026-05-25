@@ -1,7 +1,21 @@
-// User-assigned managed identity
-// TODO (issue #19 bicep-infra): implement.
+// User-assigned managed identity used by both Container Apps to call Azure AI Foundry
+// via DefaultAzureCredential (no API key in production).
+@description('Identity resource name.')
 param name string
+
+@description('Azure region.')
 param location string
+
+@description('Resource tags.')
 param tags object = {}
-output id string = ''
-output principalId string = ''
+
+resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: name
+  location: location
+  tags: tags
+}
+
+output id string = identity.id
+output name string = identity.name
+output principalId string = identity.properties.principalId
+output clientId string = identity.properties.clientId
