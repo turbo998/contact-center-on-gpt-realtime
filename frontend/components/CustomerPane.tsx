@@ -1,4 +1,5 @@
 import { StatusBadge } from "./StatusBadge";
+import { AudioControls } from "./AudioControls";
 
 export function CustomerPane() {
   return (
@@ -19,7 +20,7 @@ export function CustomerPane() {
         </div>
       </div>
       <div className="border-t border-customer-500/20 bg-white/60 p-3">
-        <div className="text-xs text-slate-500">麦克风控制 — 待 issue #15 接入</div>
+        <AudioControls variant="customer" />
       </div>
     </section>
   );
