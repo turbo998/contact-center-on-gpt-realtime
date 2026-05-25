@@ -1,0 +1,49 @@
+%% Contact Center on GPT-Realtime — Architecture
+%% Source for docs/03-architecture.md
+
+flowchart TB
+    subgraph Browser["Browser - Next.js 14 + TypeScript"]
+        CP["Customer Pane (zh-CN)<br/>🎤 mic / 🔊 speaker / 📝 subtitle"]
+        AP["Agent Pane (en-US)<br/>🎤 mic / 🔊 speaker / 📝 subtitle"]
+        AI["AI Assist Pane<br/>🧠 reasoning trace<br/>🔧 tool calls<br/>[ Escalate ]"]
+    end
+
+    subgraph Backend["FastAPI WebSocket Gateway"]
+        WSC["/ws/customer"]
+        WSA["/ws/agent"]
+        WSI["/ws/assist"]
+        TOOLS["Mock CRM Tools<br/>get_order<br/>check_tariff<br/>check_insurance"]
+        AUDIT["Audit Logger<br/>JSONL"]
+        STORE["Session Store<br/>(in-memory)"]
+    end
+
+    subgraph Foundry["Microsoft Foundry · Realtime API"]
+        T["gpt-realtime-translate<br/>(continuous S2S translation)"]
+        W["gpt-realtime-whisper<br/>(streaming transcription)"]
+        R2["gpt-realtime-2<br/>(reasoning S2S, 128K ctx,<br/>reasoning.effort=high)"]
+    end
+
+    CP -.WSS.-> WSC
+    AP -.WSS.-> WSA
+    AI -.WSS.-> WSI
+
+    WSC ==> T
+    WSC ==> W
+    WSA ==> T
+    WSA ==> W
+    WSI ==> R2
+    R2 -.function call.-> TOOLS
+
+    WSC --> AUDIT
+    WSA --> AUDIT
+    WSI --> AUDIT
+    WSC --> STORE
+    WSA --> STORE
+    WSI --> STORE
+
+    classDef foundryStyle fill:#0078D4,stroke:#fff,color:#fff
+    classDef backendStyle fill:#22c55e,stroke:#fff,color:#fff
+    classDef browserStyle fill:#a855f7,stroke:#fff,color:#fff
+    class T,W,R2 foundryStyle
+    class WSC,WSA,WSI,TOOLS,AUDIT,STORE backendStyle
+    class CP,AP,AI browserStyle

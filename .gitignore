@@ -1,0 +1,108 @@
+# ============================================================================
+# Python
+# ============================================================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.venv/
+venv/
+env/
+ENV/
+.python-version
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+.dmypy.json
+
+# ============================================================================
+# Node / Next.js
+# ============================================================================
+node_modules/
+.next/
+out/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npm
+.eslintcache
+.turbo/
+
+# ============================================================================
+# Environment & secrets
+# ============================================================================
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+*.crt
+
+# ============================================================================
+# Azure / azd
+# ============================================================================
+.azure/
+azd-env.json
+
+# ============================================================================
+# Containers
+# ============================================================================
+.docker/
+
+# ============================================================================
+# IDE
+# ============================================================================
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.sample
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# ============================================================================
+# Logs & audit
+# ============================================================================
+*.log
+logs/
+audit-*.jsonl
+recordings/
+*.wav
+*.mp3
+*.opus
