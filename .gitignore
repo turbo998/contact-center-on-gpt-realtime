@@ -50,3 +50,6 @@ Thumbs.db
 
 # Local agent plans
 .hermes/
+
+# bicep build artifacts
+infra/main.json
