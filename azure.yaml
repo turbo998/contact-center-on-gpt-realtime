@@ -1,0 +1,36 @@
+# Azure Developer CLI configuration
+# See: https://aka.ms/azd
+
+name: contact-center-on-gpt-realtime
+metadata:
+  template: contact-center-on-gpt-realtime@0.1.0
+
+services:
+  backend:
+    project: ./backend
+    language: python
+    host: containerapp
+    docker:
+      path: ./Dockerfile
+      context: .
+  frontend:
+    project: ./frontend
+    language: ts
+    host: containerapp
+    docker:
+      path: ./Dockerfile
+      context: .
+
+infra:
+  provider: bicep
+  path: infra
+  module: main
+
+hooks:
+  preprovision:
+    shell: sh
+    run: |
+      echo "Pre-provision: ensuring Foundry deployments exist..."
+      echo "  - $DEPLOYMENT_TRANSLATE"
+      echo "  - $DEPLOYMENT_WHISPER"
+      echo "  - $DEPLOYMENT_ASSISTANT"

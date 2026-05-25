@@ -1,108 +1,51 @@
-# ============================================================================
-# Python
-# ============================================================================
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-.venv/
-venv/
-env/
-ENV/
-.python-version
-pip-log.txt
-pip-delete-this-directory.txt
-.pytest_cache/
-.coverage
-.coverage.*
-htmlcov/
-.tox/
-.nox/
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-.hypothesis/
-.mypy_cache/
-.ruff_cache/
-.dmypy.json
-
-# ============================================================================
-# Node / Next.js
-# ============================================================================
-node_modules/
-.next/
-out/
-.pnp
-.pnp.js
-.yarn/install-state.gz
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
-.npm
-.eslintcache
-.turbo/
-
-# ============================================================================
-# Environment & secrets
-# ============================================================================
-.env
-.env.local
-.env.*.local
-*.pem
-*.key
-*.crt
-
-# ============================================================================
-# Azure / azd
-# ============================================================================
-.azure/
-azd-env.json
-
-# ============================================================================
-# Containers
-# ============================================================================
-.docker/
-
-# ============================================================================
-# IDE
-# ============================================================================
-.vscode/*
-!.vscode/extensions.json
-!.vscode/settings.json.sample
-.idea/
-*.swp
-*.swo
-*~
-.DS_Store
-Thumbs.db
-
-# ============================================================================
-# Logs & audit
-# ============================================================================
-*.log
-logs/
-audit-*.jsonl
-recordings/
-*.wav
-*.mp3
-*.opus
+     1|# Python
+     2|__pycache__/
+     3|*.py[cod]
+     4|*$py.class
+     5|*.so
+     6|.venv/
+     7|venv/
+     8|env/
+     9|.python-version
+    10|.pytest_cache/
+    11|.mypy_cache/
+    12|.ruff_cache/
+    13|.coverage
+    14|htmlcov/
+    15|dist/
+    16|build/
+    17|*.egg-info/
+    18|
+    19|# Node
+    20|node_modules/
+    21|.next/
+    22|out/
+    23|.turbo/
+    24|npm-debug.log*
+    25|yarn-debug.log*
+    26|yarn-error.log*
+    27|
+    28|# Env / secrets
+    29|.env
+    30|.env.local
+    31|.env.*.local
+    32|*.pem
+    33|*.key
+    34|
+    35|# Audit / runtime
+    36|audit/
+    37|*.jsonl
+    38|*.log
+    39|
+    40|# Azure / azd
+    41|.azure/
+    42|
+    43|# OS / editor
+    44|.DS_Store
+    45|Thumbs.db
+    46|.vscode/
+    47|.idea/
+    48|*.swp
+    49|
+# Local agent plans
+.hermes/
