@@ -111,6 +111,11 @@ flowchart TB
 | [08 — Risks & Mitigations](./docs/08-risks-and-mitigations.md) | 风险矩阵 |
 | [09 — Acceptance Criteria](./docs/09-acceptance-criteria.md) | 验收标准、Demo 黄金路径 |
 | [10 — Future Extensions](./docs/10-future-extensions.md) | 真实 CRM、SIP、Entra ID、可观测性等 |
+| [11 — API Contract](./docs/11-api-contract.md) | WS 协议契约、TS / Python 类型全集、错误码 |
+| [12 — Realtime Session Config](./docs/12-realtime-session-config.md) | 三模型 `session.update` 完整 payload 与字段说明 |
+| [13 — Mock Data & Tools](./docs/13-mock-data-and-tools.md) | 三个 mock CRM 工具的 schema、fixture、dispatcher |
+| [14 — Frontend Design](./docs/14-frontend-design.md) | 三栏 UI、Zustand 状态、AudioWorklet、WS 客户端 |
+| [15 — Demo Script](./docs/15-demo-script.md) | 8 分钟金路径、逐字稿、风险预案、Q&A 预备 |
 
 ---
 
