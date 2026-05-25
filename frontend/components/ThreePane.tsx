@@ -5,7 +5,16 @@ import { AssistPane } from "./AssistPane";
 
 export type Role = "both" | "customer" | "agent";
 
-export function ThreePane({ role }: { role: Role }) {
+interface ThreePaneProps {
+  role: Role;
+  onEscalate?: Parameters<typeof AgentPane>[0] extends infer P
+    ? P extends { onEscalate?: infer F }
+      ? F
+      : never
+    : never;
+}
+
+export function ThreePane({ role, onEscalate }: ThreePaneProps) {
   const showCustomer = role === "both" || role === "customer";
   const showAgent = role === "both" || role === "agent";
   const showAssist = role === "both" || role === "agent";
@@ -20,7 +29,7 @@ export function ThreePane({ role }: { role: Role }) {
       )}
     >
       {showCustomer && <CustomerPane />}
-      {showAgent && <AgentPane />}
+      {showAgent && <AgentPane onEscalate={onEscalate} />}
       {showAssist && <AssistPane />}
     </main>
   );
