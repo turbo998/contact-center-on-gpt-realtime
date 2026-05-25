@@ -140,6 +140,37 @@ flowchart TB
 
 ---
 
+## 🎙️ Smoke tests — 验证三模型连通性（Phase 2）
+
+每个 Foundry Realtime 部署都有独立的 smoke 脚本，无需启动整个 backend / frontend，
+直接确认 `session.update` 通过、首字延迟达标、输出可播放。
+
+### 准备
+
+```bash
+cd backend
+cp .env.example .env       # 填入 AZURE_OPENAI_ENDPOINT / API_KEY / DEPLOYMENT_*
+pip install -e .
+# 准备一段中文 wav（mono · 16-bit · 24kHz pcm），见 scripts/audio-samples/README.md
+```
+
+### 运行
+
+```bash
+# #4 translate — 双向口译
+python -m scripts.smoke_translate scripts/audio-samples/cs_zh_01.wav --out out_translate.wav
+
+# #5 whisper — 流式转写（开发中）
+python -m scripts.smoke_whisper scripts/audio-samples/cs_zh_01.wav
+
+# #6 assistant — 推理 + 工具调用（开发中）
+python -m scripts.smoke_assistant --order A12345
+```
+
+通过判据：脚本退出码 0，且打印的 `first_audio_ms < 1000`。
+
+---
+
 ## 🤝 Contributing
 
 仓库当前处于规划阶段。如果你想参与代码实现：
