@@ -11,6 +11,10 @@ RUN if [ -f package-lock.json ]; then npm ci --no-audit --no-fund; \
 # ---------- Stage 2: builder ----------
 FROM node:20-alpine AS builder
 WORKDIR /app
+# NEXT_PUBLIC_* vars are inlined into the client bundle at build time.
+# Pass via `--build-arg NEXT_PUBLIC_BACKEND_URL=https://...` (azd does this via azure.yaml).
+ARG NEXT_PUBLIC_BACKEND_URL=""
+ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .

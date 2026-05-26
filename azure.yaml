@@ -28,6 +28,8 @@ services:
     docker:
       path: Dockerfile
       context: .
+      buildArgs:
+        - "NEXT_PUBLIC_BACKEND_URL=${BACKEND_URL}"
 
 infra:
   provider: bicep
