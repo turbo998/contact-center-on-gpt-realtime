@@ -5,6 +5,7 @@
     "environmentName":     { "value": "${AZURE_ENV_NAME}" },
     "location":            { "value": "${AZURE_LOCATION}" },
     "foundryAccountName":  { "value": "${AZURE_FOUNDRY_ACCOUNT_NAME}" },
+    "foundryResourceGroup":{ "value": "${AZURE_FOUNDRY_RESOURCE_GROUP=}" },
     "azureOpenAiEndpoint": { "value": "${AZURE_OPENAI_ENDPOINT}" },
     "backendImage":        { "value": "${SERVICE_BACKEND_IMAGE_NAME=mcr.microsoft.com/k8se/quickstart:latest}" },
     "frontendImage":       { "value": "${SERVICE_FRONTEND_IMAGE_NAME=mcr.microsoft.com/k8se/quickstart:latest}" }
