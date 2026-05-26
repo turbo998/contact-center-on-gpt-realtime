@@ -1,11 +1,14 @@
 "use client";
 
 import { useStore } from "@/lib/store";
+import { useCallSession } from "@/lib/session/useCallSession";
 import { StatusBadge } from "./StatusBadge";
 import { ReasoningCard } from "./ReasoningCard";
 import { ToolCallTable } from "./ToolCallTable";
 
 export function AssistPane() {
+  // Open /ws/assist on mount so RT2 reasoning / tool-call envelopes flow into the store.
+  useCallSession("assist");
   const reasoning = useStore((s) => s.reasoning);
   const toolCalls = useStore((s) => s.toolCalls);
   const finalText = useStore((s) => s.finalText);

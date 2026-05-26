@@ -1,7 +1,18 @@
-import { StatusBadge } from "./StatusBadge";
+"use client";
+import { StatusBadge, type Status } from "./StatusBadge";
 import { AudioControls } from "./AudioControls";
+import { TranscriptList } from "./TranscriptList";
+import { useCallSession } from "@/lib/session/useCallSession";
+
+const STATUS_MAP: Record<"connecting" | "open" | "closed", { s: Status; label: string }> = {
+  connecting: { s: "warn", label: "连接中…" },
+  open: { s: "ok", label: "已连接" },
+  closed: { s: "idle", label: "未连接" },
+};
 
 export function CustomerPane() {
+  const { status, sendFrame, error } = useCallSession("customer");
+  const badge = STATUS_MAP[status];
   return (
     <section
       data-testid="customer-pane"
@@ -12,15 +23,13 @@ export function CustomerPane() {
           <h2 className="text-sm font-semibold text-customer-700">客户端 · Customer (ZH)</h2>
           <p className="text-xs text-slate-500">gpt-realtime-translate · 中文 ↔ 英文</p>
         </div>
-        <StatusBadge status="idle" label="未连接" />
+        <StatusBadge status={error ? "error" : badge.s} label={error ?? badge.label} />
       </div>
       <div className="flex-1 overflow-y-auto p-4">
-        <div className="text-xs italic text-slate-400">
-          字幕将在 WebSocket 连接后实时显示（issue #16）。
-        </div>
+        <TranscriptList speaker="customer" emptyHint="开始录音后字幕将实时显示。" />
       </div>
       <div className="border-t border-customer-500/20 bg-white/60 p-3">
-        <AudioControls variant="customer" />
+        <AudioControls variant="customer" onFrame={sendFrame} disabled={status !== "open"} />
       </div>
     </section>
   );
