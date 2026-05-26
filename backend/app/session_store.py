@@ -48,6 +48,7 @@ class Session:
 class SessionStore:
     def __init__(self, audit: AuditLogger) -> None:
         self._sessions: dict[str, Session] = {}
+        self._refs: dict[str, int] = {}
         self._audit = audit
         self._lock = asyncio.Lock()
 
@@ -60,8 +61,13 @@ class SessionStore:
         target_lang: str,
     ) -> Session:
         async with self._lock:
-            if call_id in self._sessions:
-                raise ValueError(f"call_id already in use: {call_id}")
+            existing = self._sessions.get(call_id)
+            if existing is not None:
+                # Idempotent attach: same call_id can be joined by multiple
+                # channels (customer + agent + assist). Refcount tracks
+                # detaches so the session lives until the last one leaves.
+                self._refs[call_id] += 1
+                return existing
             sess = Session(
                 call_id=call_id,
                 role=role,
@@ -71,6 +77,7 @@ class SessionStore:
                 audit=self._audit,
             )
             self._sessions[call_id] = sess
+            self._refs[call_id] = 1
             return sess
 
     def get(self, call_id: str) -> Session | None:
@@ -86,7 +93,12 @@ class SessionStore:
 
     async def remove(self, call_id: str) -> None:
         async with self._lock:
-            self._sessions.pop(call_id, None)
+            if call_id not in self._refs:
+                return
+            self._refs[call_id] -= 1
+            if self._refs[call_id] <= 0:
+                self._refs.pop(call_id, None)
+                self._sessions.pop(call_id, None)
 
     def active_count(self) -> int:
         return len(self._sessions)
