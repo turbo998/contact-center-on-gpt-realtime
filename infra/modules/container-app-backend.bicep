@@ -105,9 +105,12 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
             { name: 'AZURE_CLIENT_ID', value: managedIdentityClientId }
             { name: 'AZURE_OPENAI_ENDPOINT', value: azureOpenAiEndpoint }
             { name: 'AZURE_OPENAI_API_VERSION', value: azureOpenAiApiVersion }
-            { name: 'AZURE_OPENAI_DEPLOYMENT_REALTIME2', value: deploymentRealtime2 }
-            { name: 'AZURE_OPENAI_DEPLOYMENT_TRANSLATE', value: deploymentTranslate }
-            { name: 'AZURE_OPENAI_DEPLOYMENT_WHISPER', value: deploymentWhisper }
+            // NOTE: these env var names MUST stay in sync with backend/app/main.py
+            // (os.getenv('DEPLOYMENT_TRANSLATE' | 'DEPLOYMENT_WHISPER' | 'DEPLOYMENT_RT2')).
+            // See backend/tests/infra/test_env_alignment.py.
+            { name: 'DEPLOYMENT_RT2', value: deploymentRealtime2 }
+            { name: 'DEPLOYMENT_TRANSLATE', value: deploymentTranslate }
+            { name: 'DEPLOYMENT_WHISPER', value: deploymentWhisper }
             { name: 'AUDIT_DIR', value: '/app/audit' }
           ]
           probes: [
