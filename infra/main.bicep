@@ -15,6 +15,9 @@ param foundryAccountName string
 @description('Endpoint of the Foundry account, e.g. https://<acct>.openai.azure.com')
 param azureOpenAiEndpoint string
 
+@description('Resource group of the existing Foundry account (for cross-RG role assignment).')
+param foundryResourceGroup string = resourceGroup().name
+
 @description('Backend container image (set by azd after build/push).')
 param backendImage string = 'mcr.microsoft.com/k8se/quickstart:latest'
 
@@ -59,6 +62,7 @@ module managedIdentity 'modules/managed-identity.bicep' = {
 
 module foundryRole 'modules/foundry-role.bicep' = {
   name: 'foundryRole'
+  scope: resourceGroup(foundryResourceGroup)
   params: {
     foundryAccountName: foundryAccountName
     principalId: managedIdentity.outputs.principalId
